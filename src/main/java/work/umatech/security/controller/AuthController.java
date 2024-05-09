@@ -24,7 +24,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public String login(@RequestHeader Map<String, String> headers) {
-        User user = authService.getUserInfo(headers);
+//        User user = authService.getUserInfo(headers);
 //        return user.toString();
         throw new AuthFailException("auth filter exception");
     }

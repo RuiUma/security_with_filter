@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import work.umatech.security.exception.AuthFailException;
+import work.umatech.security.exception.ServerException;
+import work.umatech.security.vo.Response;
 
 
 @Slf4j
@@ -18,12 +20,19 @@ import work.umatech.security.exception.AuthFailException;
 @RestControllerAdvice
 public class ExceptionController extends ResponseEntityExceptionHandler {
     @ExceptionHandler(AuthFailException.class)
-    @ResponseBody
-    public ResponseEntity<Object> authExceptionHandler(AuthFailException exception) {
+    public ResponseEntity<Response> authExceptionHandler(AuthFailException exception) {
         log.error("auth exception");
         log.error(exception.getMessage());
-        String bodyOfResponse = "This should be application specific";
-        return new ResponseEntity<>(bodyOfResponse, HttpStatus.CONFLICT);
+        Response response = new Response(Dictionary.STATUS_FAIL, exception.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @ExceptionHandler(ServerException.class)
+    public ResponseEntity<Response> serverExceptionHandler(ServerException exception) {
+        log.error("server exception");
+        log.error(exception.getMessage());
+        Response response = new Response(Dictionary.STATUS_FAIL, exception.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 

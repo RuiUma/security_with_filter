@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import work.umatech.security.config.Dictionary;
 import work.umatech.security.config.HeaderMapRequestWrapper;
 import work.umatech.security.exception.AuthFailException;
 import work.umatech.security.service.JwtService;
@@ -46,9 +47,10 @@ public class AuthFilter implements Filter {
             requestWrapper.addHeader("userName", "testUserName");
             requestWrapper.addHeader("role", "testRole");
             requestWrapper.addHeader("email", "testEmail");
+            throw new AuthFailException("test auth");
 
-            filterChain.doFilter(requestWrapper, servletResponse);
-            return;
+//            filterChain.doFilter(requestWrapper, servletResponse);
+//            return;
         }
 
         if (cookies != null) {
@@ -59,18 +61,14 @@ public class AuthFilter implements Filter {
                     Object o = redisService.get(token);
                     if(o == null) {
                         log.info("token not valid");
-
-                        // TODO: throw exception.
-                        return;
+                        throw new AuthFailException("token not valid");
                     }
-                    log.info("");
+
                     User user = (User)o;
                     HeaderMapRequestWrapper requestWrapper = new HeaderMapRequestWrapper(httpRequest);
-                    String remote_addr = httpRequest.getRemoteAddr();
-//                    requestWrapper.addHeader("remote_addr", remote_addr);
-                    requestWrapper.addHeader("userName", user.getUserName());
-                    requestWrapper.addHeader("role", user.getRole());
-                    requestWrapper.addHeader("email", user.getEmail());
+                    requestWrapper.addHeader(Dictionary.USER_NAME, user.getUserName());
+                    requestWrapper.addHeader(Dictionary.USER_ROLE, user.getRole());
+                    requestWrapper.addHeader(Dictionary.USER_EMAIL, user.getEmail());
 
 
 
