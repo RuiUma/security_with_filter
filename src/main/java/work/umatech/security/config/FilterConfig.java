@@ -1,5 +1,6 @@
 package work.umatech.security.config;
 
+import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -11,13 +12,13 @@ import work.umatech.security.filters.LogFilter;
 @Configuration
 public class FilterConfig {
 
-    @Autowired
+    @Resource
     private LogFilter logFilter;
 
-    @Autowired
+    @Resource
     private AuthFilter authFilter;
 
-    @Autowired
+    @Resource
     ExceptionFilter exceptionFilter;
 
     @Bean

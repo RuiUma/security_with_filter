@@ -38,9 +38,11 @@ public class ExceptionController extends ResponseEntityExceptionHandler {
 
 
     @ExceptionHandler(Exception.class)
-    public void exceptionHandler(Exception exception) {
+    public ResponseEntity<Response> exceptionHandler(Exception exception) {
         log.error("exception");
         log.error(exception.getMessage());
+        Response response = new Response(Dictionary.STATUS_FAIL, exception.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
 

@@ -1,5 +1,6 @@
 package work.umatech.security.service;
 
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public class RedisService {
-    @Autowired
+    @Resource
     private RedisTemplate<String, Object> redisTemplate;
 
     public void set(String key, Object value) {

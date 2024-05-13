@@ -15,5 +15,7 @@ public final class Dictionary {
     public static final Integer STATUS_SUCCESS = 0;
     public static final Integer STATUS_FAIL = 1;
 
+    public static final String SUBJECT = "sub";
+
 
 }

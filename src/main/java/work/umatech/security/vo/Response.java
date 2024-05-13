@@ -1,5 +1,7 @@
 package work.umatech.security.vo;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.Data;
 import org.springframework.http.HttpStatus;
 import work.umatech.security.config.Dictionary;
@@ -12,8 +14,11 @@ import java.time.LocalDateTime;
 public class Response implements Serializable {
 
     private Integer status;
+
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
     private LocalDateTime timestamp;
+
     private String err;
     private Object data;
 
@@ -40,6 +45,11 @@ public class Response implements Serializable {
         this.status = status;
         this.data = data;
         this.err = err;
+    }
+
+    public Response(Object data) {
+        this();
+        this.data = data;
     }
 }
 

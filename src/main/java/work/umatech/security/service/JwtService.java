@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
 
@@ -14,35 +16,35 @@ import java.util.Map;
 @Slf4j
 @Service
 public class JwtService {
-    private String secret;
-    private int jwtExpirationInMs;
+
 
     @Value("${jwt.secret}")
-    public void setSecret(String secret) {
-        this.secret = secret;
-    }
+    private String secret;
+
 
     @Value("${jwt.expirationDateInMs}")
-    public void setJwtExpirationInMs(int jwtExpirationInMs) {
-        this.jwtExpirationInMs = jwtExpirationInMs;
+    private int jwtExpirationInMs;
+
+
+
+
+
+
+
+
+    private String createSecretKey() {
+        SecureRandom secureRandom = new SecureRandom();
+        byte[] secretBytes = new byte[72]; //36*8=288 (>256 bits required for HS256)
+        secureRandom.nextBytes(secretBytes);
+        Base64.Encoder encoder = Base64.getUrlEncoder().withoutPadding();
+        return encoder.encodeToString(secretBytes);
     }
 
-
-    // generate token for user
-//    public String generateToken(UserDetails userDetails) {
-//        Map<String, Object> claims = new HashMap<>();
-//        Collection<? extends GrantedAuthority> roles = userDetails.getAuthorities();
-//        if (roles.contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
-//            claims.put("isAdmin", true);
-//        }
-//        if (roles.contains(new SimpleGrantedAuthority("ROLE_USER"))) {
-//            claims.put("isUser", true);
-//        }
-//        return doGenerateToken(claims, userDetails.getUsername());
-//    }
-
     public String generateToken(Map<String, Object> claims, String subject) {
-        return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
+
+
+
+        return Jwts.builder().claims(claims).subject(subject).issuedAt(new Date(System.currentTimeMillis()))
                 .signWith(SignatureAlgorithm.HS512, secret).compact();
     }
 
