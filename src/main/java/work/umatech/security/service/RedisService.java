@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.TimeUnit;
+
 
 @Slf4j
 @Service
@@ -26,13 +28,11 @@ public class RedisService {
     }
 
     public void setWithTimeout(String key, Object value, long timeout) {
-        redisTemplate.opsForValue().set(key, value, timeout);
+        redisTemplate.opsForValue().set(key, value, timeout, TimeUnit.SECONDS);
     }
 
-
-
-
-
-
+    public Boolean renewExpireTime(String key, long timeout) {
+        return redisTemplate.expire(key, timeout, TimeUnit.SECONDS);
+    }
 
 }

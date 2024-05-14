@@ -22,7 +22,7 @@ public class JwtService {
     private String secret;
 
 
-    @Value("${jwt.expirationDateInMs}")
+    @Value("${jwt.expirationTime}")
     private int jwtExpirationInMs;
 
 

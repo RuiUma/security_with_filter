@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import work.umatech.security.config.Dictionary;
 import work.umatech.security.config.HeaderMapRequestWrapper;
 import work.umatech.security.exception.AuthFailException;
+import work.umatech.security.service.AuthService;
 import work.umatech.security.service.JwtService;
 import work.umatech.security.service.RedisService;
 import work.umatech.security.vo.UserTable;
@@ -25,17 +26,31 @@ public class AuthFilter implements Filter {
     JwtService jwtService;
 
     @Resource
+    AuthService authService;
+
+    @Resource
     RedisService redisService;
 
     @Value("${spring.isDev}")
     String isDev;
+
+    @Value("${jwt.expirationTime}")
+    Long redisTimeOutInSec;
 
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         log.info("start auth filter");
 
+
         HttpServletRequest httpRequest = (HttpServletRequest) servletRequest;
+        String path = httpRequest.getServletPath();
+        log.info(path);
+        if (authService.checkUrlPassAuth(path)) {
+            log.info("path to auth...");
+            filterChain.doFilter(servletRequest,servletResponse);
+            return;
+        }
         Cookie[] cookies = httpRequest.getCookies();
 
         if ("true".equals(isDev)) {
@@ -68,11 +83,11 @@ public class AuthFilter implements Filter {
                     requestWrapper.addHeader(Dictionary.USER_ROLE, objectMap.get(Dictionary.USER_ROLE).toString());
                     requestWrapper.addHeader(Dictionary.USER_EMAIL, objectMap.get(Dictionary.USER_EMAIL).toString());
 
-
-
+                    Boolean renew = redisService.renewExpireTime(token, redisTimeOutInSec);
+                    if (!renew) {
+                        redisService.setWithTimeout(token,objectMap,redisTimeOutInSec);
+                    }
                     filterChain.doFilter(requestWrapper, servletResponse);
-
-
                 }
             }
         }

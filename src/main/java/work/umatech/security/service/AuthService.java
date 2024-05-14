@@ -1,13 +1,15 @@
 package work.umatech.security.service;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import work.umatech.security.config.Dictionary;
-import work.umatech.security.vo.Response;
 import work.umatech.security.vo.UserTable;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @Service
 public class AuthService {
 
@@ -17,8 +19,8 @@ public class AuthService {
 
     private final RedisService redisService;
 
-    @Value("${jwt.expirationDateInMs}")
-    Long redisTimeOut;
+    @Value("${jwt.expirationTime}")
+    Long redisTimeOutInSec;
 
     public AuthService(JwtService jwtService, RedisService redisService) {
         this.jwtService = jwtService;
@@ -46,8 +48,18 @@ public class AuthService {
         claim.put(Dictionary.USER_EMAIL, user.getEmail());
         claim.put(Dictionary.USER_ROLE, user.getRole());
         String jwt = jwtService.generateToken(claim, Dictionary.SUBJECT);
-        redisService.setWithTimeout(jwt,claim, redisTimeOut);
+        redisService.setWithTimeout(jwt,claim, redisTimeOutInSec);
         return jwt;
+    }
+
+    public Boolean checkUrlPassAuth(String requestPath) {
+        for(String url: Dictionary.AUTH_URL_LIST) {
+            log.info(url);
+            if (requestPath.startsWith(url)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 
